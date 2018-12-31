@@ -8,6 +8,7 @@ use Intervention\Image\ImageManager;
 
 class LetterAvatar
 {
+
     /**
      * Image Type PNG
      */
@@ -23,23 +24,25 @@ class LetterAvatar
      */
     private $name;
 
-
     /**
      * @var string
      */
     private $nameInitials;
-
 
     /**
      * @var string
      */
     private $shape;
 
-
     /**
      * @var int
      */
     private $size;
+
+    /**
+     * @var ColorProviderInterface
+     */
+    private $colorProvider;
 
     /**
      * @var ImageManager
@@ -52,12 +55,13 @@ class LetterAvatar
      * @param string $shape
      * @param int    $size
      */
-    public function __construct(string $name, string $shape = 'circle', int $size = 48)
+    public function __construct(string $name, string $shape = 'circle', int $size = 48, ColorProviderInterface $colorProvider = null)
     {
         $this->setName($name);
-        $this->setImageManager(new ImageManager());
         $this->setShape($shape);
         $this->setSize($size);
+        $this->setColorProvider($colorProvider);
+        $this->setImageManager(new ImageManager());
     }
 
     /**
@@ -67,7 +71,6 @@ class LetterAvatar
     {
         $this->name = $name;
     }
-
 
     /**
      * @param ImageManager $imageManager
@@ -85,7 +88,6 @@ class LetterAvatar
         $this->shape = $shape;
     }
 
-
     /**
      * @param int $size
      */
@@ -94,6 +96,16 @@ class LetterAvatar
         $this->size = $size;
     }
 
+    /**
+     * @param ColorProviderInterface $colorProvider
+     */
+    private function setColorProvider(ColorProviderInterface $colorProvider = null)
+    {
+        if ($colorProvider === null) {
+            $colorProvider = new RandomColorProvider(2);
+        }
+        $this->colorProvider = $colorProvider;
+    }
 
     /**
      * @return \Intervention\Image\Image
@@ -103,7 +115,7 @@ class LetterAvatar
         $isCircle = $this->shape === 'circle';
 
         $this->nameInitials = $this->getInitials($this->name);
-        $color = $this->stringToColor($this->name);
+        $color = $this->colorProvider->getBackgroundColor($this->name);
 
         $canvas = $this->imageManager->canvas(480, 480, $isCircle ? null : $color);
 
@@ -111,13 +123,12 @@ class LetterAvatar
             $canvas->circle(480, 240, 240, function (CircleShape $draw) use ($color) {
                 $draw->background($color);
             });
-
         }
 
         $canvas->text($this->nameInitials, 240, 240, function (Font $font) {
             $font->file(__DIR__ . '/fonts/arial-bold.ttf');
             $font->size(220);
-            $font->color('#fafafa');
+            $font->color($this->colorProvider->getTextColor($this->name));
             $font->valign('middle');
             $font->align('center');
         });
@@ -131,16 +142,15 @@ class LetterAvatar
      */
     private function getInitials(string $name): string
     {
-        $nameParts = $this->break_name($name);
+        $nameParts = $this->breakName($name);
 
-        if(!$nameParts) {
+        if (!$nameParts) {
             return '';
         }
 
         $secondLetter = $nameParts[1] ? $this->getFirstLetter($nameParts[1]) : '';
 
         return $this->getFirstLetter($nameParts[0]) . $secondLetter;
-
     }
 
     /**
@@ -179,7 +189,7 @@ class LetterAvatar
      */
     public function __toString(): string
     {
-        return (string)$this->generate()->encode('data-url');
+        return (string) $this->generate()->encode('data-url');
     }
 
     /**
@@ -189,30 +199,13 @@ class LetterAvatar
      * @param string $name Name to be broken up
      * @return array Name broken up to an array
      */
-    private function break_name(string $name): array
+    private function breakName(string $name): array
     {
         $words = \explode(' ', $name);
         $words = array_filter($words, function($word) {
-            return $word!=='' && $word !== ',';
+            return $word !== '' && $word !== ',';
         });
         return array_values($words);
-    }
-
-    /**
-     * @param string $string
-     * @return string
-     */
-    protected function stringToColor(string $string): string
-    {
-        // random color
-        $rgb = substr(dechex(crc32($string)), 0, 6);
-        // make it darker
-        $darker = 2;
-        list($R16, $G16, $B16) = str_split($rgb, 2);
-        $R = sprintf('%02X', floor(hexdec($R16) / $darker));
-        $G = sprintf('%02X', floor(hexdec($G16) / $darker));
-        $B = sprintf('%02X', floor(hexdec($B16) / $darker));
-        return '#' . $R . $G . $B;
     }
 
 }
