@@ -202,7 +202,7 @@ class LetterAvatar
      * @param string $string
      * @return string
      */
-    private function stringToColor(string $string): string
+    protected function stringToColor(string $string): string
     {
         // random color
         $rgb = substr(dechex(crc32($string)), 0, 6);
