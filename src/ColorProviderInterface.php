@@ -1,6 +1,6 @@
 <?php
 
-namespace YoHang88\LetterAvatar;
+namespace filsh\LetterAvatar;
 
 interface ColorProviderInterface
 {
