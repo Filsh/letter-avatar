@@ -32,7 +32,7 @@
     },
     "autoload": {
         "psr-4": {
-            "filsh\\LetterAvatar\\": "src/"
+            "filsh\\LetterAvatar\\": "src"
         }
     }
 }
