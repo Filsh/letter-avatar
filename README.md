@@ -23,7 +23,7 @@ $ composer require yohang88/letter-avatar
 ``` php
 <?php
 
-use YoHang88\LetterAvatar\LetterAvatar;
+use filsh\LetterAvatar\LetterAvatar;
 
 $avatar = new LetterAvatar('Steven Spielberg');
 
@@ -35,6 +35,8 @@ $avatar->saveAs('path/to/filename');
 $avatar->saveAs('path/to/filename', LetterAvatar::MIME_TYPE_JPEG);
 
 // Own Color Provider
+$colorProvider = new \filsh\LetterAvatar\RandomColorProvider(1.3);
+// or
 $colorProvider = new \filsh\LetterAvatar\ColorPaletteProvider([
     "#1abc9c", "#2ecc71", "#3498db", "#9b59b6", "#34495e", "#16a085", "#27ae60", "#2980b9", "#8e44ad", "#2c3e50",
     "#f1c40f", "#e67e22", "#e74c3c", "#a5a8a8", "#95a5a6", "#f39c12", "#d35400", "#c0392b", "#bdc3c7", "#7f8c8d",
