@@ -1,6 +1,6 @@
 <?php
 
-namespace YoHang88\LetterAvatar;
+namespace filsh\LetterAvatar;
 
 use Intervention\Image\Gd\Font;
 use Intervention\Image\Gd\Shapes\CircleShape;
